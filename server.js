@@ -1,7 +1,7 @@
 const http = require('http');
 const { v4: uuidv4 } = require('uuid');
 const errorHandle = require('./method/errorHandle');
-const { HEADERS } = require('./method/constant');
+const { HEADERS, REQUEST_METHOD } = require('./method/constant');
 const todos = [];
 
 
@@ -15,14 +15,14 @@ const requestListener = (req, res) => {
   });
 
 
-  if(req.url === '/todos' && req.method === 'GET'){
+  if(req.url === '/todos' && req.method === REQUEST_METHOD.GET){
     res.writeHead(200, HEADERS);
     res.write(JSON.stringify({
       status: 'success',
       data: todos,
     }));
     res.end();
-  } else if(req.url === '/todos' && req.method === 'POST'){
+  } else if(req.url === '/todos' && req.method === REQUEST_METHOD.POST){
 
     // 監聽end事件
     req.on('end', ()=>{
@@ -48,7 +48,7 @@ const requestListener = (req, res) => {
       };
 
     });
-  } else if(req.url === '/todos' && req.method === 'DELETE'){
+  } else if(req.url === '/todos' && req.method === REQUEST_METHOD.DELETE){
     todos.length = 0; // 清空陣列
     res.writeHead(200, HEADERS);
     res.write(JSON.stringify({
@@ -56,7 +56,7 @@ const requestListener = (req, res) => {
       data: todos,
     }));
     res.end();
-  } else if(req.url.startsWith('/todos/') && req.method === 'DELETE'){
+  } else if(req.url.startsWith('/todos/') && req.method === REQUEST_METHOD.DELETE){
     const id = req.url.split('/').pop(); // 取得 id
     const index = todos.findIndex(item=>item.id === id); // 搜尋陣列引索 index
     if(index !== -1) {
@@ -71,7 +71,7 @@ const requestListener = (req, res) => {
       errorHandle(res, "查無此id");
     }
 
-  } else if(req.url.startsWith('/todos/') && req.method === 'PATCH'){
+  } else if(req.url.startsWith('/todos/') && req.method === REQUEST_METHOD.PATCH){
 
     req.on('end',()=>{
       try{
@@ -99,7 +99,7 @@ const requestListener = (req, res) => {
       }
     });
 
-  } else if(req.method === 'OPTIONS'){  // preflight 預檢請求
+  } else if(req.method === REQUEST_METHOD.OPTIONS){  // preflight 預檢請求
     res.writeHead(200, HEADERS);
     res.end();
   } else {
