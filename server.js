@@ -1,14 +1,6 @@
 const http = require('http');
 const { v4: uuidv4 } = require('uuid');
-const todos = [{
-    title: '我是貓咪',
-    id: uuidv4(),
-  },
-  {
-    title: '我是狗',
-    id: uuidv4(),
-  },
-];
+const todos = [];
 
 
 const requestListener = (req, res) => {
@@ -19,6 +11,14 @@ const requestListener = (req, res) => {
     'Content-Type': 'application/json',
   }
 
+  let body = "";
+
+  // 監聽data事件
+  req.on('data', (chunk)=>{
+    body+=chunk;
+  });
+
+
   if(req.url === '/todos' && req.method === 'GET'){
     res.writeHead(200, headers);
     res.write(JSON.stringify({
@@ -26,10 +26,28 @@ const requestListener = (req, res) => {
       data: todos,
     }));
     res.end();
-  } else if(req.method === 'OPTIONS'){  // 預檢請求
+  } else if(req.url === '/todos' && req.method === 'POST'){
+
+    // 監聽end事件
+    req.on('end', ()=>{
+      const { title } = JSON.parse(body);
+      const todo = {
+        title,
+        id: uuidv4(),
+      };
+      todos.push(todo);
+      res.writeHead(200, headers);
+      res.write(JSON.stringify({
+        status: 'success',
+        data: todos,
+      }));
+      res.end();
+    });
+  } else if(req.method === 'OPTIONS'){  // preflight 預檢請求
     res.writeHead(200, headers);
     res.end();
   } else {
+    // 404頁
     res.writeHead(404, headers);
     res.write(JSON.stringify({
       status: 'false',
