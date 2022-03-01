@@ -1,6 +1,6 @@
 const http = require('http');
 const { v4: uuidv4 } = require('uuid');
-const errorHandle = require('./method/errorHandle');
+const { errorHandle, successHandle } = require('./method/httpHandle');
 const { HEADERS, REQUEST_METHOD } = require('./method/constant');
 const todos = [];
 
@@ -14,14 +14,8 @@ const requestListener = (req, res) => {
     body+=chunk;
   });
 
-
   if(req.url === '/todos' && req.method === REQUEST_METHOD.GET){
-    res.writeHead(200, HEADERS);
-    res.write(JSON.stringify({
-      status: 'success',
-      data: todos,
-    }));
-    res.end();
+    successHandle(res, todos);
   } else if(req.url === '/todos' && req.method === REQUEST_METHOD.POST){
 
     // 監聽end事件
@@ -34,12 +28,7 @@ const requestListener = (req, res) => {
             id: uuidv4(),
           };
           todos.push(todo);
-          res.writeHead(200, HEADERS);
-          res.write(JSON.stringify({
-            status: 'success',
-            data: todos,
-          }));
-          res.end();
+          successHandle(res, todos);
         } else {
           errorHandle(res, "title 欄位未正確填寫");
         }
@@ -50,23 +39,13 @@ const requestListener = (req, res) => {
     });
   } else if(req.url === '/todos' && req.method === REQUEST_METHOD.DELETE){
     todos.length = 0; // 清空陣列
-    res.writeHead(200, HEADERS);
-    res.write(JSON.stringify({
-      status: 'success',
-      data: todos,
-    }));
-    res.end();
+    successHandle(res, todos);
   } else if(req.url.startsWith('/todos/') && req.method === REQUEST_METHOD.DELETE){
     const id = req.url.split('/').pop(); // 取得 id
     const index = todos.findIndex(item=>item.id === id); // 搜尋陣列引索 index
     if(index !== -1) {
       todos.splice(index, 1); // 刪除一筆
-      res.writeHead(200, HEADERS);
-      res.write(JSON.stringify({
-        status: 'success',
-        data: todos,
-      }));
-      res.end();
+      successHandle(res, todos);
     } else {
       errorHandle(res, "查無此id");
     }
@@ -81,12 +60,7 @@ const requestListener = (req, res) => {
         
         if( title !== undefined && index !== -1){
           todos[index].title = title;
-          res.writeHead(200, HEADERS);
-          res.write(JSON.stringify({
-            status: 'success',
-            data: todos,
-          }));
-          res.end();
+          successHandle(res, todos);
         } else if( title === undefined) {
           errorHandle(res, 'title 欄位未正確填寫');
         } else if( index === -1 ){
@@ -104,12 +78,7 @@ const requestListener = (req, res) => {
     res.end();
   } else {
     // 404頁
-    res.writeHead(404, HEADERS);
-    res.write(JSON.stringify({
-      status: 'false',
-      message: '無此網站路由',
-    }));
-    res.end();
+    errorHandle(res, '無此網站路由', 404);
   }
 }
 
