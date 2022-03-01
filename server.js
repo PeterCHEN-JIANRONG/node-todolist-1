@@ -59,7 +59,7 @@ const requestListener = (req, res) => {
     res.writeHead(200, headers);
     res.write(JSON.stringify({
       status: 'success',
-      message: "刪除全部成功",
+      data: todos,
     }));
     res.end();
   } else if(req.url.startsWith('/todos/') && req.method === 'DELETE'){
@@ -70,7 +70,7 @@ const requestListener = (req, res) => {
       res.writeHead(200, headers);
       res.write(JSON.stringify({
         status: 'success',
-        message: "刪除單筆成功",
+        data: todos,
       }));
       res.end();
     } else {
