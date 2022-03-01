@@ -53,6 +53,14 @@ const requestListener = (req, res) => {
       };
 
     });
+  } else if(req.url === '/todos' && req.method === 'DELETE'){
+    todos.length = 0; // 清空陣列
+    res.writeHead(200, headers);
+    res.write(JSON.stringify({
+      status: 'success',
+      message: "刪除全部成功",
+    }));
+    res.end();
   } else if(req.method === 'OPTIONS'){  // preflight 預檢請求
     res.writeHead(200, headers);
     res.end();
