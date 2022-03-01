@@ -61,6 +61,21 @@ const requestListener = (req, res) => {
       message: "刪除全部成功",
     }));
     res.end();
+  } else if(req.url.startsWith('/todos/') && req.method === 'DELETE'){
+    const id = req.url.split('/').pop(); // 取得 id
+    const index = todos.findIndex(item=>item.id === id); // 搜尋陣列引索 index
+    if(index !== -1) {
+      todos.splice(index, 1); // 刪除一筆
+      res.writeHead(200, headers);
+      res.write(JSON.stringify({
+        status: 'success',
+        message: "刪除單筆成功",
+      }));
+      res.end();
+    } else {
+      errorHandle(res, "查無此id");
+    }
+
   } else if(req.method === 'OPTIONS'){  // preflight 預檢請求
     res.writeHead(200, headers);
     res.end();
