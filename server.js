@@ -113,11 +113,11 @@ const requestListener = (req, res) => {
     res.writeHead(404, headers);
     res.write(JSON.stringify({
       status: 'false',
-      message: '無此路由',
+      message: '無此網站路由',
     }));
     res.end();
   }
 }
 
 const server = http.createServer(requestListener);
-server.listen(8080);
+server.listen(process.env.PORT || 3005);
