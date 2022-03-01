@@ -5,7 +5,7 @@ const headers = {
   'Content-Type': 'application/json',
 }
 
-function errorHandle(res, message){
+function errorHandle(res, message = '程式執行錯誤'){
   res.writeHead(400, headers);
   res.write(JSON.stringify({
     status: 'false',

@@ -1,3 +1,4 @@
+const { log } = require('console');
 const http = require('http');
 const { v4: uuidv4 } = require('uuid');
 const errorHandle = require('./method/errorHandle');
@@ -75,6 +76,34 @@ const requestListener = (req, res) => {
     } else {
       errorHandle(res, "查無此id");
     }
+
+  } else if(req.url.startsWith('/todos/') && req.method === 'PATCH'){
+
+    req.on('end',()=>{
+      try{
+        const { title } = JSON.parse(body);
+        const id = req.url.split('/todos/').pop();
+        const index = todos.findIndex(item=> item.id === id);
+        
+        if( title !== undefined && index !== -1){
+          todos[index].title = title;
+          res.writeHead(200, headers);
+          res.write(JSON.stringify({
+            status: 'success',
+            data: todos,
+          }));
+          res.end();
+        } else if( title === undefined) {
+          errorHandle(res, 'title 欄位未正確填寫');
+        } else if( index === -1 ){
+          errorHandle(res, '查無此id');
+        } else {
+          errorHandle(res);
+        };
+      } catch(err){
+        errorHandle(res, 'JSON 格式錯誤');
+      }
+    });
 
   } else if(req.method === 'OPTIONS'){  // preflight 預檢請求
     res.writeHead(200, headers);
