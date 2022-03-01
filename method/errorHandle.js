@@ -1,12 +1,7 @@
-const headers = {
-  'Access-Control-Allow-Headers': 'Content-Type, Authorization, Content-Length, X-Requested-With',
-  'Access-Control-Allow-Origin': '*',
-  'Access-Control-Allow-Methods': 'PATCH, POST, GET,OPTIONS,DELETE',
-  'Content-Type': 'application/json',
-}
+const { HEADERS } = require('./constant');
 
 function errorHandle(res, message = '程式執行錯誤'){
-  res.writeHead(400, headers);
+  res.writeHead(400, HEADERS);
   res.write(JSON.stringify({
     status: 'false',
     message,
