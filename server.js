@@ -1,5 +1,6 @@
 const http = require('http');
 const { v4: uuidv4 } = require('uuid');
+const errorHandle = require('./method/errorHandle');
 const todos = [];
 
 
@@ -30,18 +31,27 @@ const requestListener = (req, res) => {
 
     // 監聽end事件
     req.on('end', ()=>{
-      const { title } = JSON.parse(body);
-      const todo = {
-        title,
-        id: uuidv4(),
+      try{
+        const { title } = JSON.parse(body);
+        if(title !== undefined){
+          const todo = {
+            title,
+            id: uuidv4(),
+          };
+          todos.push(todo);
+          res.writeHead(200, headers);
+          res.write(JSON.stringify({
+            status: 'success',
+            data: todos,
+          }));
+          res.end();
+        } else {
+          errorHandle(res, "title 欄位未正確填寫");
+        }
+      }catch(err){
+        errorHandle(res, "JSON 格式錯誤");
       };
-      todos.push(todo);
-      res.writeHead(200, headers);
-      res.write(JSON.stringify({
-        status: 'success',
-        data: todos,
-      }));
-      res.end();
+
     });
   } else if(req.method === 'OPTIONS'){  // preflight 預檢請求
     res.writeHead(200, headers);
