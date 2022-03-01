@@ -55,7 +55,7 @@ const requestListener = (req, res) => {
     req.on('end',()=>{
       try{
         const { title } = JSON.parse(body);
-        const id = req.url.split('/todos/').pop();
+        const id = req.url.split('/').pop();
         const index = todos.findIndex(item=> item.id === id);
         
         if( title !== undefined && index !== -1){
